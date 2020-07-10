@@ -1,11 +1,21 @@
+const querystring =require('querystring')//js原生模块
 //将blog和user的接口模块引入进来
 const handleBlogRouter = require('./src/router/blog')
 const handleUserRouter = require('./src/router/user')
+
 
 //写回调函数
 const serverHandle = (req,res)=>{
     //设置返回格式是字符串，字符串是JSON格式
     res.setHeader('Content-type','application/json')
+    
+    //获取path，统一在外面获取path
+    const url = req.url
+    req.path = url.split('?')[0]  //直接将req.path 赋值成路由地址。那么就不需要在blog.js user.js中重新去计算path了
+
+    //解析query，公共方法都放在js里去写
+    req.query = querystring.parse(url.split('?')[1]) //url中的query以对象的形式放在req.query中
+
     //处理blog路由
     const blogData = handleBlogRouter(req,res) //调用处理blog路由的函数，并传入参数，返回一个值，blogData是对象，因为这个函数的返回值就是对象
     //如果有值，那么结束并返回blogData（顺便从对象转换成字符串）
