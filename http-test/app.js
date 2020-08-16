@@ -1,41 +1,23 @@
-const http = require('http')
-const querystring = require('querystring')
+//启动文件
+const server = require('./server')
+//4、将router引入进来
+const router = require('./router')
+//7、引入handler.js，并解包，然后定义handle
+const { home,review,api_record } = require('./handler')
 
-const server = http.createServer((req,res) => {
-    const method = req.method
-    const url = req.url
-    const path = url.split('?')[0]
-    const query = url.split('?')[1]
-    //设置返回格式为JSON
-    res.setHeader('Content-type','application/json')
-    //返回的数据
-    const resData ={
-        method,
-        url,
-        path,
-        query
-    }
-    //返回
-    if (method === "GET"){
-        //返回
-        res.end(
-            JSON.stringify(resData) //stringify是把对象转换成字符串格式，字符串是json格式
-        )
-    }  
-    if (method === 'POST'){
-        let postData=''
-        req.on('data',chunk=>{
-            postData+=chunk.toString()
-        })
-        req.on('end',()=>{
-            resData.postData=postData //把postData加到resData中
-            //返回
-            res.end(
-                JSON.stringify(resData)
-            )
-        })
-    }
-})
+//key是路径，value是函数
+handle = {
+    '/' : home,
+    '/home' : home,
+    '/review' : review,
+    '/api/v1/records' : api_record
+}
+//handle = { home,review,api_record }
+// console.log(handle)
+// console.log(handle['/'])
+// console.log(handle['/home']())
 
-server.listen(8000)
-console.log('OK')
+//2、再传一个route进去
+//5、将route改成router.route
+//8、将handle传进去
+server.startServer(router.route,handle)
